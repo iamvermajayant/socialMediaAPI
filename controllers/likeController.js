@@ -1,6 +1,6 @@
 const supabase = require("../config/supabase");
 
-const likePost = async () => {
+const likePost = async (req, res) => {
   const userId = req.user.id;
   const { postId } = req.params;
 
@@ -32,8 +32,41 @@ const likePost = async () => {
   res.status(201).json({ message: "Post liked !", like: data });
 };
 
-const unlikePost = async () => {};
+const unlikePost = async (req, res) => {
+  const userId = req.user.id;
+  const { postId } = req.params;
 
-const getPostLikes = async () => {};
+  const { data: existing } = await supabase
+    .from("likes")
+    .select(id)
+    .eq("user_id", userId)
+    .eq("post_id", postId)
+    .single();
+
+  if (!existing)
+    return res.status(400).json({ error: "You have not liked this post" });
+
+  const { error } = await supabase
+    .from("likes")
+    .delete()
+    .eq("user_id", userId)
+    .eq("post_id", postId);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ message: "Post Unliked!" });
+};
+
+const getPostLikes = async (req, res) => {
+  const { postId } = req.params;
+
+  const { data, error, count } = await supabase
+    .from("likes")
+    .select("*, profiles(id,username, avatar_url)", { count: "exact" })
+    .eq("post_id", postId);
+
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(200).json({ total_likes: count, likes: data });
+};
 
 module.exports = { likePost, unlikePost, getPostLikes };
