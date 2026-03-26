@@ -5,6 +5,7 @@ const profileRoutes = require('./routes/profileRoutes');
 const postRoutes = require('./routes/postRoutes');
 const likeRoutes = require('./routes/likeRoutes');
 const commentRoutes = require('./routes/commentRoutes');
+const followRoutes = require('./routes/followRoutes');
 const PORT = 3001;
 
 dotenv.config();
@@ -18,6 +19,8 @@ app.use('/api/profile', profileRoutes)
 app.use('/api/posts', postRoutes);
 app.use('/api/likes', likeRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/follow', followRoutes);
+
 
 app.get('/', (req,res) => {
     res.send("Hello")
